@@ -166,10 +166,8 @@ async def delete_chat(chat_data: DeleteChatSchema, request: Request, db: Session
     if not user_in_chat:
         raise HTTPException(status_code=403, detail="You are not a member of this chat")
 
-    # Удаляем все связи пользователей с этим чатом в UserChat
     db.query(UserChat).filter(UserChat.chat_id == chat.id).delete(synchronize_session=False)
 
-    # Удаляем сам чат
     db.delete(chat)
     db.commit()
 
@@ -205,7 +203,6 @@ def get_messages(
     payload = security._decode_token(access_token)
     user_id = int(payload.sub)
 
-    # Фильтрация сразу по chat_id и user_id
     messages = db.query(Message).filter(
         Message.chat_id == chat_data.chat_id,
         Message.user_id == user_id

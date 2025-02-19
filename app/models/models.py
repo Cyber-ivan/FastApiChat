@@ -3,17 +3,27 @@ from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy import create_engine
 from app.core.config import settings
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 
 class Base(DeclarativeBase):
     pass
 
 
-engine = create_engine(
-    url=settings.database_url,
+async_engine = create_async_engine(settings.database_url)
+
+AsyncSessionLocal = sessionmaker(
+    bind=async_engine, class_=AsyncSession, expire_on_commit=False
 )
 
-session_factory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+
+#
+# engine = create_engine(
+#     url=settings.database_url,
+# )
+#
+# session_factory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
 class User(Base):

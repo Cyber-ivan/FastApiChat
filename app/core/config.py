@@ -12,12 +12,14 @@ class Settings(BaseSettings):
 
     @property
     def database_url(self):
-        return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
-    model_config = SettingsConfigDict(env_file="../../.env")
+    model_config = SettingsConfigDict(env_file="../.env")
 
 
 settings = Settings()
+
+
 
 config = AuthXConfig()
 config.JWT_SECRET_KEY = settings.JWT_SECRET_KEY

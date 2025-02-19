@@ -7,8 +7,8 @@ app = FastAPI(
 )
 
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-app.include_router(chat.router, prefix="/chat", tags=["Chat"])
-app.include_router(users.router, prefix="/users", tags=["Users"])
+# app.include_router(chat.router, prefix="/chat", tags=["Chat"])
+# app.include_router(users.router, prefix="/users", tags=["Users"])
 
 def main():
     import uvicorn

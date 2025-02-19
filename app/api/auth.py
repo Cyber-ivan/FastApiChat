@@ -1,6 +1,16 @@
 from fastapi import APIRouter, Depends
+from app.schemas.auth import (
+    CreateUserSchema,
+    UserResponse,
+    LoginUserSchema,
+    LoginResponseSchema,
+    LogoutResponseSchema,
+    RefreshTokenResponseSchema
+)
 
-router = APIRouter()
+router = APIRouter(
+    tags=["Auth"],
+)
 
 
 def get_db():
@@ -11,8 +21,8 @@ def get_db():
         db.close()
 
 
-@router.post("/auth/register")
-async def createuser(user: UserCreateSchema, db: Session = Depends(get_db)):
+@router.post("/register", response_model=UserResponse)
+async def createuser(user: CreateUserSchema, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -27,8 +37,8 @@ async def createuser(user: UserCreateSchema, db: Session = Depends(get_db)):
     return {"message": "User registered successfully", "user_id": new_user.id, "email": new_user.email}
 
 
-@router.post("/auth/login")
-async def login(user: UserLoginSchema, response: Response, db: Session = Depends(get_db)):
+@router.post("/auth/login", response_model=LoginResponseSchema)
+async def login(user: LoginUserSchema, response: Response, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         if hash_password(user.password) == existing_user.password:
@@ -43,7 +53,7 @@ async def login(user: UserLoginSchema, response: Response, db: Session = Depends
             raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-@router.post("/auth/refresh")
+@router.post("/auth/refresh", response_model=RefreshTokenResponseSchema)
 async def refresh_token(response: Response, request: Request, db: Session = Depends(get_db)):
     refresh_token = request.cookies.get(config.JWT_REFRESH_COOKIE_NAME)
     if not refresh_token:
@@ -69,7 +79,7 @@ async def refresh_token(response: Response, request: Request, db: Session = Depe
     #     )
 
 
-@router.post("/auth/logout")
+@router.post("/auth/logout", response_model=LogoutResponseSchema)
 async def logout(response: Response, request: Request, db: Session = Depends(get_db)):
     my_refresh_token = request.cookies.get(config.JWT_REFRESH_COOKIE_NAME)
     access_token = request.cookies.get(config.JWT_ACCESS_COOKIE_NAME)

@@ -1,6 +1,19 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Table, Column, ForeignKey, Integer, String
-from database import Base
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import create_engine
+from app.core.config import settings
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    pass
+
+
+engine = create_engine(
+    url=settings.database_url,
+)
+
+session_factory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
 class User(Base):
@@ -28,8 +41,8 @@ class Chat(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
 
-
     users = relationship("User", secondary="user_chats", back_populates="chats")
+
 
 class Message(Base):
     __tablename__ = "messages"

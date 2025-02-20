@@ -58,6 +58,7 @@ async def login(user: LoginUserSchema, response: Response, db: Session = Depends
         else:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
+
 @router.post("/refresh", response_model=RefreshTokenResponseSchema)
 async def refresh_token(response: Response, request: Request, db: Session = Depends(get_db)):
     refresh_token = request.cookies.get("refresh_token")
@@ -74,15 +75,15 @@ async def refresh_token(response: Response, request: Request, db: Session = Depe
         access_token = create_access_token(
             data={"sub": current_user.id}
         )
+        response.set_cookie("access_token", access_token)
+        response.set_cookie("refresh_token", refresh_token)
         return {"message": "Access token refreshed", "access_token": access_token}
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
 
 
-# @router.post("/auth/logout", response_model=LogoutResponseSchema)
-# async def logout(response: Response, request: Request, db: Session = Depends(get_db)):
-#     my_refresh_token = request.cookies.get(config.JWT_REFRESH_COOKIE_NAME)
-#     access_token = request.cookies.get(config.JWT_ACCESS_COOKIE_NAME)
-#     response.delete_cookie(config.JWT_ACCESS_COOKIE_NAME)
-#     response.delete_cookie(config.JWT_REFRESH_COOKIE_NAME)
-#     return {"message": "Logged out successfully", "access_token": access_token}
+@router.post("/logout", response_model=LogoutResponseSchema)
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+    return {"message": "Logged out successfully"}

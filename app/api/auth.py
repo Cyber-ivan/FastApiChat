@@ -45,10 +45,10 @@ async def login(user: LoginUserSchema, response: Response, db: Session = Depends
     if current_user:
         if verify_password(user.password, current_user.password):
             access_token = create_access_token(
-                data={"sub": current_user.id}
+                data={"sub": str(current_user.id)}
             )
             refresh_token = create_refresh_token(
-                data={"sub": current_user.id}
+                data={"sub": str(current_user.id)}
             )
             response.set_cookie("access_token", access_token)
             response.set_cookie("refresh_token", refresh_token)
@@ -66,14 +66,14 @@ async def refresh_token(response: Response, request: Request, db: Session = Depe
         raise HTTPException(status_code=401, detail="Refresh token not found")
     payload = decode_token(refresh_token)
     try:
-        user_id = payload.sub
-        stmt = select(User).where(User.email == user_id)
+        user_id = payload.get("sub")
+        stmt = select(User).where(User.id == int(user_id))
         result = await db.execute(stmt)
         current_user = result.scalars().first()
         if not current_user:
             raise HTTPException(status_code=401, detail="User not found")
         access_token = create_access_token(
-            data={"sub": current_user.id}
+            data={"sub": str(current_user.id)}
         )
         response.set_cookie("access_token", access_token)
         response.set_cookie("refresh_token", refresh_token)

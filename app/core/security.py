@@ -43,6 +43,8 @@ def decode_token(token: str):
     :return:
     """
     try:
-        return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-    except JWTError:
+        result = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return result
+    except Exception as e:
+        print(f"JWT Decode Error: {e}")
         return None

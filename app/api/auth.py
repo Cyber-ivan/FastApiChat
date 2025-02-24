@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from sqlalchemy.orm import Session
 from app.dependency.database import get_db
 from app.dependency.auth import get_password_hash, verify_password
-from app.models.models import User, Chat, UserChat, Message
+from app.models.models import User
 from sqlalchemy.future import select
 from app.core.security import create_refresh_token, create_access_token, decode_token
 from app.schemas.auth import (
@@ -76,7 +76,6 @@ async def refresh_token(response: Response, request: Request, db: Session = Depe
             data={"sub": str(current_user.id)}
         )
         response.set_cookie("access_token", access_token)
-        response.set_cookie("refresh_token", refresh_token)
         return {"message": "Access token refreshed", "access_token": access_token}
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid or expired refresh token")

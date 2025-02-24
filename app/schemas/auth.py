@@ -6,6 +6,7 @@ class CreateUserSchema(BaseModel):
     username: str
     password: str
 
+
 class UserResponse(BaseModel):
     id: int
     name: str
@@ -14,19 +15,24 @@ class UserResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class LoginUserSchema(BaseModel):
     email: EmailStr
     password: str
+
 
 class LoginResponseSchema(BaseModel):
     access_token: str
     refresh_token: str
     message: str
+
     class Config:
         from_attributes = True
 
+
 class LogoutResponseSchema(BaseModel):
     message: str
+
 
 class RefreshTokenResponseSchema(BaseModel):
     message: str

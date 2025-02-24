@@ -12,18 +12,7 @@ class Base(DeclarativeBase):
 
 async_engine = create_async_engine(settings.database_url)
 
-AsyncSessionLocal = sessionmaker(
-    bind=async_engine, class_=AsyncSession, expire_on_commit=False
-)
-
-
-
-#
-# engine = create_engine(
-#     url=settings.database_url,
-# )
-#
-# session_factory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+AsyncSessionLocal = sessionmaker(bind=async_engine, class_=AsyncSession, expire_on_commit=False)
 
 
 class User(Base):
